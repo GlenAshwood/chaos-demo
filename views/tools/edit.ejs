@@ -1,0 +1,35 @@
+<% include ../partials/header %>
+    <div class="row">
+        <h1 style="text-align: center">Edit <%= tool.name %></h1>
+        <div style="width: 30%; margin: 25px auto;">
+            <form action="/tools/<%=tool._id%>?_method=PUT" method="POST">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input class="form-control" type="text" name="name" id="name" value="<%= tool.name %>">
+                </div>
+                <div class="form-group">
+                    <label for="image">Image Url</label>
+                    <input class="form-control" type="text" name="image" id="image" pattern="^https:\/\/images\.unsplash\.com\/.*" title="Only images from images.unsplash.com allowed. See link below for instructions." placeholder="https://images.unsplash.com/..." value="<%= tool.image %>" required>
+                    <small>Click <a href="https://youtu.be/Bn3weNRQRDE">here</a> for tutorial on how to copy unsplash urls.</small>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" rows="5" id="description" name="description" value="<%= tool.description %>"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="review">Review</label>
+                    <textarea class="form-control" rows="5" id="review" name="review" value="<%= tool.review %>"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="rating">Rating out of 10</label>
+                    <input class="form-control" type="number" name="rating" id="rating" value="<%= tool.rating %>" step="1" min="0" max="10">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-lg btn-primary btn-block">Update!</button>
+                </div>
+            </form>
+            <a href="/tools">Go Back</a>
+        </div>
+    </div>
+<% include ../partials/footer %>
+
