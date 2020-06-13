@@ -2,7 +2,7 @@
 var express = require("express");
 var app = express();
 var bodyParser = require('body-parser');
-var port = process.env.PORT || 8080;
+var port = 8080;
 var ip = process.env.IP || "127.0.0.1";
 
 // import local IP of the hosting server
