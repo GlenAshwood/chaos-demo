@@ -1,0 +1,43 @@
+<% include ../partials/header %> 
+
+     <header class="jumbotron">
+         <div class="container">
+             <h1><span class="glyphicon glyphicon-wrench"></span> Welcome To DevOpsTools!</h1>
+             <p>View our hand-picked DevOps tools from all over the world</p>
+             <p>
+                <a class="btn btn-primary btn-lg" href="/tools/new">Add New Tool</a>
+             </p>
+              <p>
+              <form action="/tools" method="GET" class="form-inline" id="tool-search">
+                <div class="form-group">
+                  <input type="text" name="search" placeholder="Tool search..." class="form-control">
+                </div>
+              </form>
+             </p>
+         </div>
+     </header>
+     
+     <div class="row text-center flex-wrap" id="tool-grid">
+        <% tools.forEach(function(tool){ %>
+            <div class="col-md-3 col-sm-6">
+                <div class="thumbnail">
+                   <a href="/tools/<%= tool._id %>">
+                       <img src="<%= tool.image %>">
+                   </a>
+                   <div class="caption">
+                       <h4><%= tool.name %></h4>
+                        <p>
+                            <% for (var i = 0; i < 5; i++) { %>
+                                <span class="glyphicon glyphicon-star<%= (i < tool.rating - 0.5)? '' : '-empty'%>"></span>
+                            <% } %>
+                        </p>
+                   </div>
+                   <p>
+                       <a href="/tools/<%= tool._id %>" class="btn btn-primary">More Info</a>
+                   </p>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+
+<% include ../partials/footer %>

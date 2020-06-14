@@ -1,0 +1,94 @@
+<% include ../partials/header %>
+<div class="row">
+  <div class="col-md-3">
+    <p class="lead">DevOpsTools</p>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><%=tool.name%></h3>
+      </div>
+      <div class="panel-body">
+        <p>
+            <% for (var i = 0; i < 5; i++) { %>
+                <span class="glyphicon glyphicon-star<%= (i < tool.rating - 0.5)? '' : '-empty'%>"></span>
+            <% } %>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="thumbnail">
+      <img class="img-responsive" src="<%= tool.image %>">
+      <div class="caption-full">
+        <h4><a><%=tool.name%></a></h4>
+        <p><%= tool.description %></p>
+        <h5><a>Review</a></h5>
+        <p><%= tool.review %></p>
+        <p>
+          <em>Submitted by: <%= tool.author.username %>, <%= moment(tool.createdAt).fromNow() %></em>
+        </p>
+        <% if(currentUser && tool.author.id.equals(currentUser._id) || currentUser && currentUser.isAdmin){ %>
+        <a class="btn btn-warning" href="/tools/<%= tool._id %>/edit">Edit</a>
+        <form action="/tools/<%= tool._id %>?_method=DELETE" method="POST" class="delete-form">
+          <button class="btn btn-danger">Delete</button>
+        </form>
+        <% } %>
+      </div>
+    </div>
+    <div class="well">
+      <div class="text-right">
+        <a class="btn btn-success" href="/tools/<%= tool._id %>/comments/new">Add New Comment</a>
+      </div>
+      <hr>
+      <% tool.comments.forEach(function(comment){ %>
+      <div class="row">
+        <div class="col-md-12">
+          <strong><%= comment.author.username %></strong>
+          <span class="pull-right"><%= moment(comment.createdAt).fromNow() %></span>
+          <div>
+           <%= comment.text %> 
+
+           <% if(currentUser && comment.author.id.equals(currentUser._id) || currentUser && currentUser.isAdmin){ %>
+            <div class="pull-right">
+              <a href="/tools/<%=tool._id%>/comments/<%=comment._id%>/edit" class="btn btn-xs btn-warning">EDIT</a>
+              <form class="delete-form" action="/tools/<%=tool._id%>/comments/<%=comment._id%>?_method=DELETE" method="POST">
+                <button class="btn btn-xs btn-danger">DELETE</button>
+              </form>
+            </div>
+          <% } %>
+          <hr>
+        </div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+</div>
+</div>
+<script>
+  function initMap() {
+    var lat = <%= tool.lat %>;
+    var lng = <%= tool.lng %>;
+    var center = {lat: lat, lng: lng };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 8,
+        center: center,
+        scrollwheel: false
+    });
+    var contentString = `
+      <strong><%= tool.name %><br />
+      <%= tool.location %></strong>
+      <p><%= tool.description %></p>
+    `
+    var infowindow = new google.maps.InfoWindow({
+      content: contentString
+    });
+    var marker = new google.maps.Marker({
+        position: center,
+        map: map
+    });
+    marker.addListener('click', function() {
+      infowindow.open(map, marker);
+    });
+  }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBkG51lwJtDvYFKTBdRZlhzYg1D4QFsXPU&callback=initMap"></script>
+<% include ../partials/footer %>
