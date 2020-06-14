@@ -4,7 +4,7 @@ var Tool = require("../models/tool");
 var Comment = require("../models/comment");
 var middleware = require("../middleware");
 var geocoder = require('geocoder');
-var { isLoggedIn, checkUserTool, checkUserComment, isAdmin, isSafe } = middleware; // destructuring assignment
+var { isLoggedIn, checkUserTool, checkUserComment, isAdmin } = middleware; // destructuring assignment
 
 // Define escapeRegex function for search feature
 function escapeRegex(text) {
@@ -40,7 +40,7 @@ router.get("/", function(req, res){
 });
 
 //CREATE - add new tool to DB
-router.post("/", isLoggedIn, isSafe, function(req, res){
+router.post("/", isLoggedIn, function(req, res){
   // get data from form and add to tools array
   var name = req.body.name;
   var image = req.body.image;
@@ -92,7 +92,7 @@ router.get("/:id/edit", isLoggedIn, checkUserTool, function(req, res){
 });
 
 // PUT - updates tool in the database
-router.put("/:id", isSafe, function(req, res){
+router.put("/:id", function(req, res){
     var newData = {name: req.body.name, image: req.body.image, description: req.body.description, review: req.body.review, rating: req.body.rating};
     Tool.findByIdAndUpdate(req.params.id, {$set: newData}, function(err, tool){
         if(err){

@@ -15,6 +15,10 @@ var express     = require("express"),
 // configure dotenv
 require('dotenv').load();
 
+// setup vars
+const port = process.env.PORT || 3000;
+const ip = process.env.IP || "127.0.0.1";
+
 //requiring routes
 var commentRoutes    = require("./routes/comments"),
     toolRoutes = require("./routes/tools"),
@@ -23,7 +27,8 @@ var commentRoutes    = require("./routes/comments"),
 // assign mongoose promise library and connect to database
 mongoose.Promise = global.Promise;
 
-const databaseUri = process.env.MONGODB_URI || 'mongodb://localhost/devops';
+const databaseUri = ("mongodb://" + process.env.DB_USER + ':' + process.env.DB_PASS + "@" + process.env.DB_HOST + "/" + process.env.DB)
+
 
 mongoose.connect(databaseUri, {useNewUrlParser: true, useUnifiedTopology: true})
       .then(() => console.log(`Database connected`))
@@ -65,5 +70,5 @@ app.use("/tools", toolRoutes);
 app.use("/tools/:id/comments", commentRoutes);
 
 app.listen(process.env.PORT, process.env.IP, function(){
-   console.log("The YelpCamp Server Has Started!");
+   console.log("The DevopsTools Server has started on " + process.env.IP + ": " + process.env.PORT);
 });

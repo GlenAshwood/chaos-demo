@@ -2,22 +2,27 @@
 <div class="row">
   <div class="col-md-3">
     <p class="lead">DevOpsTools</p>
-    <div class="list-group">
-      <li class="list-group-item active">Info 1</li>
-      <li class="list-group-item">Info 2</li>
-      <li class="list-group-item">Info 3</li>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><%=tool.name%></h3>
+      </div>
+      <div class="panel-body">
+        <p>
+            <% for (var i = 0; i < 5; i++) { %>
+                <span class="glyphicon glyphicon-star<%= (i < tool.rating - 0.5)? '' : '-empty'%>"></span>
+            <% } %>
+        </p>
+      </div>
     </div>
-    <div id="map"></div>
   </div>
   <div class="col-md-9">
     <div class="thumbnail">
       <img class="img-responsive" src="<%= tool.image %>">
       <div class="caption-full">
-        <h4 class="pull-right">
-          $<%= tool.cost %>/night
-        </h4>
         <h4><a><%=tool.name%></a></h4>
         <p><%= tool.description %></p>
+        <h5><a>Review</a></h5>
+        <p><%= tool.review %></p>
         <p>
           <em>Submitted by: <%= tool.author.username %>, <%= moment(tool.createdAt).fromNow() %></em>
         </p>
