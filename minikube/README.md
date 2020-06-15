@@ -42,7 +42,7 @@ Confirm Minikube IP
 minikube ip
 ```
 Open Application
-http://{minikube_ip}:30080/
+http://*minikube_ip*:30080/
 
 ## Destroy Application
 ```
