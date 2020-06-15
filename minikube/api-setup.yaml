@@ -1,0 +1,53 @@
+#Secret
+apiVersion: v1
+data:
+  DB: ZGV2b3Bz
+  DB_HOST: ZGV2b3BzLW1vbmdvZGItc2VydmljZToyNzAxNw==
+  DB_PASS: VGVzdDEyMw==
+  DB_USER: bW9uZ29kYg==
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: mongo-conection-secret
+
+---
+#Pod
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: frontend
+  name: frontend
+spec:
+  containers:
+  - envFrom:
+      - secretRef:
+          name: mongo-conection-secret
+    image: gashers82/devops-tools-api:1.0.0-pm2
+    imagePullPolicy: Always
+    name: frontend
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+---
+#Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: frontend
+  name: frontend
+spec:
+  ports:
+  - port: 3000 
+    protocol: TCP
+    targetPort: 3000
+    nodePort: 30080
+  selector:
+    run: frontend
+  type: NodePort
+status:
+  loadBalancer: {}
