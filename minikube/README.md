@@ -1,3 +1,5 @@
+<img src="../screenshoot.png" align="centre" />
+
 # Minikube Setup
 
 ## Dependencies
