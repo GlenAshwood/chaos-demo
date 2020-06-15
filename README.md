@@ -2,7 +2,7 @@
 
 # Kubernetes Chaos experiments that will test the availability, reliability and scalability of a basic two tier (Node.js and MongoDB) applicaion.
 
-## Special thanks to Viktor Farcic for his course on Udemy
+## Special thanks to Viktor Farcic for his chaos course on Udemy
 [Udemy Course](https://www.udemy.com/course/kubernetes-chaos-engineering-with-chaos-toolkit-and-istio/)
 
 ## Description
