@@ -9,7 +9,7 @@
 - [Git](https://git-scm.com/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 - [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) or [EKS](https://eksctl.io/)
-- [Helm v3.x](https://helm.sh/docs/intro/install/) - if EKS
+- [Helm v3.x](https://helm.sh/docs/intro/install/)
 - [Python v3.x](https://www.python.org/downloads)
 - [pip](https://pip.pypa.io/en/stable/installing)
 
