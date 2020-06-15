@@ -7,30 +7,34 @@ data:
   DB_USER: bW9uZ29kYg==
 kind: Secret
 metadata:
-  creationTimestamp: null
   name: mongo-conection-secret
+  namespace: chaos-space
 
 ---
-#Pod
-apiVersion: v1
-kind: Pod
+#API Deployment
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
-    run: frontend
-  name: frontend
+    app: devops-tools-api
+  name: devops-tools-api
+  namespace: chaos-space
 spec:
-  containers:
-  - envFrom:
-      - secretRef:
-          name: mongo-conection-secret
-    image: gashers82/devops-tools-api:1.0.0-pm2
-    imagePullPolicy: Always
-    name: frontend
-    resources: {}
-  dnsPolicy: ClusterFirst
-  restartPolicy: Always
-status: {}
+  replicas: 2
+  selector:
+    matchLabels:
+      app: devops-tools-api
+  template:
+    metadata:
+      labels:
+        app: devops-tools-api
+    spec:
+      containers:
+      - image: gashers82/devops-tools-api:1.0.0-pm2
+        name: devops-tools-api
+        envFrom:
+        - secretRef:
+            name: mongo-conection-secret
 
 ---
 #Service
@@ -38,8 +42,9 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    run: frontend
-  name: frontend
+    app: devops-tools-api
+  name:  devops-tools-api-service
+  namespace: chaos-space
 spec:
   ports:
   - port: 3000 
@@ -47,7 +52,7 @@ spec:
     targetPort: 3000
     nodePort: 30080
   selector:
-    run: frontend
+    app: devops-tools-api
   type: NodePort
 status:
   loadBalancer: {}
