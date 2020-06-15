@@ -31,7 +31,7 @@ kubectl label namespace chaos-space istio-injection=enabled
 
 Deploy API and Mongo into **chaos-space** namespace
 ```
-helm install mongo-release -f mongo-values.yaml\
+helm install devopstools-release -f mongo-values.yaml\
   bitnami/mongodb
 kubectl apply -f api-setup.yaml
 ```
@@ -45,7 +45,7 @@ http://{minikube_ip}:30080/
 ## Destroy Application
 ```
 kubectl delete -f api-setup.yaml
-helm uninstall mongo-release
+helm uninstall devopstools-release
 ```
 or 
 ```
