@@ -41,3 +41,18 @@ minikube ip
 ```
 Open Application
 http://{minikube_ip}:30080/
+
+## Destroy Application
+```
+kubectl delete -f api-setup.yaml
+helm uninstall mongo-release
+```
+or 
+```
+kubectl delete ns chaos-space
+```
+
+## Destroy Cluster
+```
+minikube delete
+```
