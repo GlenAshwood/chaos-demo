@@ -7,20 +7,37 @@
 - [Helm v3.x](https://helm.sh/docs/intro/install/)
 - [Python v3.x](https://www.python.org/downloads)
 - [pip](https://pip.pypa.io/en/stable/installing)
+- [istioctl](https://istio.io/latest/docs/setup/install/)
 
 ## Aplication
 The application being tested is called DevOpsTools-API
 - [DockerHub](https://hub.docker.com/repository/docker/gashers82/devops-tools-api)
 - [GitHub](https://github.com/GlenAshwood/DevOpsTools-API)
 
-## Install
+## Startup Minikube
 ```
 minikube start
-helm install mongo-release \
---set mongodbUsername=mongodb,mongodbPassword=Test123,mongodbDatabase=devops,service.name=devops-mongodb-service \
-bitnami/mongodb
+```
+
+## Install Service Mesh
+TBC
+
+## Install Application
+Create **chaos-space** namespace and enable istio-injection (incase we use it later)
+```
+kubectl create namespace chaos-space
+kubectl label namespace chaos-space istio-injection=enabled
+```
+
+Deploy API and Mongo into **chaos-space** namespace
+```
+helm install mongo-release -f mongo-values.yaml\
+  bitnami/mongodb
 kubectl apply -f api-setup.yaml
 ```
+Confirm Minikube IP
+```
 minikube ip
-
+```
+Open Application
 http://{minikube_ip}:30080/
