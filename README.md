@@ -14,7 +14,7 @@
 - [pip](https://pip.pypa.io/en/stable/installing)
 
 ## Aplication
-Application be tested is called DevOpsTools-API
+The application being tested is called DevOpsTools-API
 - [DockerHub](https://hub.docker.com/repository/docker/gashers82/devops-tools-api)
 - [GitHub](https://github.com/GlenAshwood/DevOpsTools-API)
 
