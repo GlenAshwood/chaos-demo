@@ -12,20 +12,31 @@
 - [istioctl](https://istio.io/latest/docs/setup/install/)
 
 ## Aplication
-The application being tested is called DevOpsTools-API
+The application being tested is called DevOpsTools-API, a Node.js API that connects to a Mongo Database. Both components will be deployed on our cluster. 
 - [DockerHub](https://hub.docker.com/repository/docker/gashers82/devops-tools-api)
 - [GitHub](https://github.com/GlenAshwood/DevOpsTools-API)
 
-## Startup Minikube
+Clone **chaos-demo** repo and change directory to **minikube**
+```
+git clone https://github.com/GlenAshwood/chaos-demo.git
+cd minikube
+```
+
+## Setup Cluster Minikube
 
 Create or restart Minikube Cluster
 ```
 minikube start
 ```
+Enable the *NGINX Ingress controller* addon:
+```
+minikube addons enable ingress
+```
 Enable *metrics-server* addon (optional):
 ```
 minikube addons enable metrics-server
 ```
+
 
 ## Install Service Mesh
 TBC
@@ -47,12 +58,14 @@ helm install devopstools-release -f mongo-values.yaml\
   bitnami/mongodb
 kubectl apply -f api-setup.yaml
 ```
-Confirm Minikube IP
+To check current Minikube IP
 ```
 minikube ip
 ```
-Open Application: 
-http://**minikube_ip**:30080/
+To open Application in default browser: 
+```
+minikube service devops-tools-api-service  -n chaos-space
+```
 
 ## Destroy Application
 ```
