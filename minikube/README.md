@@ -36,6 +36,10 @@ Create **chaos-space** namespace and enable istio-injection (incase we use it la
 kubectl create namespace chaos-space
 kubectl label namespace chaos-space istio-injection=enabled
 ```
+Change context to **chaos-space**namespace
+```
+kubectl config set-context --current --namespace=chaos-space
+```
 
 Deploy API and Mongo into **chaos-space** namespace
 ```
