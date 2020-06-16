@@ -17,8 +17,14 @@ The application being tested is called DevOpsTools-API
 - [GitHub](https://github.com/GlenAshwood/DevOpsTools-API)
 
 ## Startup Minikube
+
+Create or restart Minikube Cluster
 ```
 minikube start
+```
+Enable *metrics-server* addon (optional):
+```
+minikube addons enable metrics-server
 ```
 
 ## Install Service Mesh
