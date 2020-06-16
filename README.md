@@ -2,11 +2,11 @@
 
 # Kubernetes Chaos experiments that will test the availability, reliability and scalability of a basic two tier (Node.js and MongoDB) applicaion.
 
-## Special thanks to Viktor Farcic for his chaos course on Udemy
-[Udemy Course](https://www.udemy.com/course/kubernetes-chaos-engineering-with-chaos-toolkit-and-istio/)
-
 ## Description
 "It worked in UAT" is just one of the phrases no one wants to hear in production. This project will try to explore how Chaos Engineering can be implemented within multiple Kubernetes environments.
+
+## Special thank you to Viktor Farcic for his chaos course on Udemy
+[Udemy Course](https://www.udemy.com/course/kubernetes-chaos-engineering-with-chaos-toolkit-and-istio/) on kubernetes chaos engineering with chaos toolkit and istio
 
 ## Dependencies
 - [Git](https://git-scm.com/)
@@ -15,6 +15,15 @@
 - [Helm v3.x](https://helm.sh/docs/intro/install/)
 - [Python v3.x](https://www.python.org/downloads)
 - [pip](https://pip.pypa.io/en/stable/installing)
+
+##  Chaos Toolkit
+- [Git Repo](https://github.com/chaostoolkit/chaostoolkit)
+- [Website](https://chaostoolkit.org/)
+### Addon used
+- [chaostoolkit-kubernetes](https://github.com/chaostoolkit/chaostoolkit-kubernetes)
+- [chaostoolkit-reporting](https://github.com/chaostoolkit/chaostoolkit-reporting)
+
+
 
 ## Aplication
 The application being tested is called DevOpsTools-API
