@@ -118,7 +118,7 @@ expected output:
 [2020-06-17 17:48:49 INFO] No declared rollbacks, let's move on.
 [2020-06-17 17:48:49 INFO] Experiment ended with status: completed
 ```
-Again, the experiment passed, which gives us a little bit more confidence in our application's ability to recover from an slight outage.
+Again, the experiment passed, which gives us a little bit more confidence in our application's ability to recover from a slight outage.
 
 ## Destroy Application
 ```
