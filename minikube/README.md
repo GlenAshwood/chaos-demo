@@ -37,7 +37,6 @@ Enable *metrics-server* addon (optional):
 minikube addons enable metrics-server
 ```
 
-
 ## Install Service Mesh
 TBC
 
@@ -66,6 +65,31 @@ To open Application in default browser:
 ```
 minikube service devops-tools-api-service  -n chaos-space
 ```
+
+## Experiment 1 - Basic health check on DevToolApp
+This experiment will check w that all pods within the choosen namespace (in our case **chaos-space**) are running, if "healthy", a random pod with our choosen label (**app=devops-tools-api**) will be terminatated. Once that action has been completed, the namespace will be probed again.
+
+```
+chaos run chaos/health-test-1.yaml
+```
+expected output:
+``` bash
+[2020-06-17 13:47:42 INFO] Validating the experiment's syntax
+[2020-06-17 13:47:43 INFO] Experiment looks valid
+[2020-06-17 13:47:43 INFO] Running experiment: What happens if we terminate an instance of the application (devops-tools-api)?
+[2020-06-17 13:47:43 INFO] Steady state hypothesis: The app is healthy
+[2020-06-17 13:47:43 INFO] Probe: all-apps-are-healthy
+[2020-06-17 13:47:43 INFO] Steady state hypothesis is met!
+[2020-06-17 13:47:43 INFO] Action: terminate-app-pod
+[2020-06-17 13:47:43 INFO] Steady state hypothesis: The app is healthy
+[2020-06-17 13:47:43 INFO] Probe: all-apps-are-healthy
+[2020-06-17 13:47:43 INFO] Steady state hypothesis is met!
+[2020-06-17 13:47:43 INFO] Let's rollback...
+[2020-06-17 13:47:43 INFO] No declared rollbacks, let's move on.
+[2020-06-17 13:47:43 INFO] Experiment ended with status: completed
+```
+The experiment passed, but it really doesnt tell us anything useful.
+
 
 ## Destroy Application
 ```
