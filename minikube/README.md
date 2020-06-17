@@ -32,9 +32,13 @@ Enable the *NGINX Ingress controller* addon:
 ```
 minikube addons enable ingress
 ```
-Enable *metrics-server* addon (optional):
+Enable *metrics-server* addon:
 ```
 minikube addons enable metrics-server
+```
+Export Minikube ip to $INGRESS_HOST (which will be used later):
+```
+export INGRESS_HOST=$(minikube ip)
 ```
 
 ## Install Service Mesh
@@ -66,8 +70,8 @@ To open Application in default browser:
 minikube service devops-tools-api-service  -n chaos-space
 ```
 
-## Experiment 1 - Basic health check on DevToolApp
-This experiment will check w that all pods within the choosen namespace (in our case **chaos-space**) are running, if "healthy", a random pod with our choosen label (**app=devops-tools-api**) will be terminatated. Once that action has been completed, the namespace will be probed again.
+## Experiment 1 - Basic health check on DevTool pods
+This experiment will verify that all pods are running within the choosen namespace (in our case **chaos-space**), if "healthy", a random pod with our choosen label (**app=devops-tools-api**) will be terminatated. Once that action has been completed, the namespace will be probed again to confirm pods are running
 
 ```
 chaos run chaos/health-test-1.yaml
@@ -88,8 +92,33 @@ expected output:
 [2020-06-17 13:47:43 INFO] No declared rollbacks, let's move on.
 [2020-06-17 13:47:43 INFO] Experiment ended with status: completed
 ```
-The experiment passed, but it really doesnt tell us anything useful.
+The experiment passed, but it really doesnt tell us anything that useful beisdes the pods within that namespace are running before and after the experiment.
 
+## Experiment 2 - Basic health check on DevToolApp
+
+This time, instead of just verifying thats pods are running before and after the experiment, we will check the availability of the application by validating that **http://${ingress_host}/tools** is reachable before and again after we terminate a random instance's of the devops-tools-api app. 
+
+```
+chaos run chaos/health-test-2.yaml
+```
+expected output:
+``` bash
+[2020-06-17 17:48:46 INFO] Validating the experiment's syntax
+[2020-06-17 17:48:47 INFO] Experiment looks valid
+[2020-06-17 17:48:47 INFO] Running experiment: What happens if we terminate an instance of the application(devops-tools-api)?
+[2020-06-17 17:48:47 INFO] Steady state hypothesis: The application is healthy
+[2020-06-17 17:48:47 INFO] Probe: app-responds-to-requests
+[2020-06-17 17:48:47 INFO] Steady state hypothesis is met!
+[2020-06-17 17:48:47 INFO] Action: terminate-app-pod
+[2020-06-17 17:48:47 INFO] Pausing after activity for 2s...
+[2020-06-17 17:48:49 INFO] Steady state hypothesis: The application is healthy
+[2020-06-17 17:48:49 INFO] Probe: app-responds-to-requests
+[2020-06-17 17:48:49 INFO] Steady state hypothesis is met!
+[2020-06-17 17:48:49 INFO] Let's rollback...
+[2020-06-17 17:48:49 INFO] No declared rollbacks, let's move on.
+[2020-06-17 17:48:49 INFO] Experiment ended with status: completed
+```
+Again, the experiment passed, which gives us a little bit more confidence in our application's ability to recover from an slight outage.
 
 ## Destroy Application
 ```
