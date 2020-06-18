@@ -311,7 +311,7 @@ report.pdf
 
 Report generated as 'report.pdf'
 ```
-Once run, you see a pdf version of report like the example below:
+Once complete, you will have generated a pdf version of report like the example below:
 
 <img src="report-example.png" align="centre" />
 
