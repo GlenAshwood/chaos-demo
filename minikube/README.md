@@ -190,7 +190,7 @@ So, lets try experiment 3 again (I actually found this quite exciting, as I wasn
 [2020-06-17 23:24:04 INFO] No declared rollbacks, let's move on.
 [2020-06-17 23:24:04 INFO] Experiment ended with status: completed
 ```
-The experiment passed, but I wanted to confirm that the result was consistant for across all three instances of the DB. It wasnt, as the experiment would fail if the primary was the instance terminated. 
+The experiment passed, but I wanted to confirm that the result were consistant across all three instances of the DB. It wasnt, as the experiment would fail if the primary was the instance terminated. 
 
 ```
 $chaos run chaos/health-test-3.yaml 
@@ -222,7 +222,7 @@ pod/devops-tools-mongodb-arbiter-0     1/1     Running             0          64
 pod/devops-tools-mongodb-primary-0     0/1     ContainerCreating   0          8s
 pod/devops-tools-mongodb-secondary-0   1/1     Running             0          64m
 ```
-As I wasnt seeing the outage as the user (apart from a slower response), I decided to increase my pause timers until the primary passed the test. Obviously in the real world, you wouldnt do this, you would tune your application and database.
+As I wasnt seeing the outage as the user (apart from a slower response), I decided to try increasing my pause timers until the primary passed the test. Obviously in the real world, you wouldnt do this, you would tune your application and database!
 
 So at 11 seconds (5.5 times slower than we originally wanted), our DB setup passes our experiment when the primary is terminated. 
 
