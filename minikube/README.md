@@ -1,6 +1,6 @@
 <img src="../screenshoot.png" align="centre" />
 
-# Minikube Setup
+# MINIKUBE SETUP AND EXPERIMENTS
 
 ## Dependencies
 - [Git](https://git-scm.com/)
