@@ -260,7 +260,58 @@ Although recovery wasnt seamless, we can now confidently say that our deployment
 
 ## Reporting
 
+You can also report on your experiments by adding the **--journal-path** flag to your chaos run command
 
+```
+chaos run chaos/health-test-2.yaml \
+  --journal-path journal-health-http-api.json
+
+[2020-06-18 15:40:02 INFO] Validating the experiment's syntax
+[2020-06-18 15:40:04 INFO] Experiment looks valid
+[2020-06-18 15:40:04 INFO] Running experiment: What happens if we terminate an instance of the application(devops-tools-api)?
+[2020-06-18 15:40:04 INFO] Steady state hypothesis: The application is healthy
+[2020-06-18 15:40:04 INFO] Probe: app-responds-to-requests
+[2020-06-18 15:40:04 INFO] Steady state hypothesis is met!
+[2020-06-18 15:40:04 INFO] Action: terminate-app-pod
+[2020-06-18 15:40:04 INFO] Pausing after activity for 2s...
+[2020-06-18 15:40:06 INFO] Steady state hypothesis: The application is healthy
+[2020-06-18 15:40:06 INFO] Probe: app-responds-to-requests
+[2020-06-18 15:40:06 INFO] Steady state hypothesis is met!
+[2020-06-18 15:40:06 INFO] Let's rollback...
+[2020-06-18 15:40:06 INFO] No declared rollbacks, let's move on.
+[2020-06-18 15:40:06 INFO] Experiment ended with status: completed
+```
+```
+chaos run chaos/health-test-4.yaml \
+  --journal-path journal-health-http-db.json
+  
+[2020-06-18 15:46:31 INFO] Validating the experiment's syntax
+[2020-06-18 15:46:32 INFO] Experiment looks valid
+[2020-06-18 15:46:32 INFO] Running experiment: What happens if we terminate an instance of MongoDB?
+[2020-06-18 15:46:32 INFO] Steady state hypothesis: The application is healthy
+[2020-06-18 15:46:32 INFO] Probe: app-responds-to-requests
+[2020-06-18 15:46:32 INFO] Steady state hypothesis is met!
+[2020-06-18 15:46:32 INFO] Action: terminate-db-pod
+[2020-06-18 15:46:32 INFO] Pausing after activity for 11s...
+[2020-06-18 15:46:43 INFO] Steady state hypothesis: The application is healthy
+[2020-06-18 15:46:43 INFO] Probe: app-responds-to-requests
+[2020-06-18 15:46:44 INFO] Steady state hypothesis is met!
+[2020-06-18 15:46:44 INFO] Let's rollback...
+[2020-06-18 15:46:44 INFO] No declared rollbacks, let's move on.
+[2020-06-18 15:46:44 INFO] Experiment ended with status: completed
+```
+You can install the reporting addon for Chaos Toolkit or you can run the command within Docker, like we will here.
+
+Run the following docker command to report on the above experiments:
+```
+docker container run --user $(id -u) --volume $PWD:/tmp/result \
+-it chaostoolkit/reporting -- report --export-format=pdf \
+journal-health-http-api.json  journal-health-http-db.json \
+report.pdf
+
+Report generated as 'report.pdf'
+```
+<img src="report-example.png" align="centre" />
 
 ## Destroy Application
 ```
