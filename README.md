@@ -50,7 +50,9 @@ you can also install the reporting add-on, but that requires a few extra depende
 - [chaostoolkit-reporting (optional)](https://github.com/chaostoolkit/chaostoolkit-reporting)
 
 ## The Aplication we will be experimenting on
-Our chaos experiments will be run against an application called "DevOpsTools", a Nodejs API that connects to a MongoDB backend and written just for this project (I am not a developer, so please do not judge me too harshly). 
+Our chaos experiments will be run against an application called "DevOpsTools", a Nodejs API that connects to a MongoDB backend and written just for this project (I am not a developer, so please do not judge me too harshly).
+
+**NOTE: signing up, signing in and logging in is taking far too long, I will look into this, but it will not affect our experiments**
 
 <img src="screenshoot-2.png" align="centre" />
 
@@ -66,7 +68,11 @@ Our chaos experiments will be run against an application called "DevOpsTools", a
 A walkthrough of these experiments can be found [Here](https://github.com/GlenAshwood/chaos-demo/tree/master/minikube)
 
 ## KIND Experiments
-- TBC
+- Experiment 1 - Basic application health check and app termination
+- Experiment 2 - HTTP health check and app termination
+- Experiment 3 - HTTP health check and DB termination
+- Experiment 4 - Draining Node (TBC)
+- Experiment 5 - Deleting Node (TBC)
 
 A walkthrough of these experiments can be found [Here](https://github.com/GlenAshwood/chaos-demo/tree/master/kind)
 
