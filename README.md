@@ -58,7 +58,6 @@ Our chaos experiments will be run against an application called "DevOpsTools", a
 - [DockerHub](https://hub.docker.com/repository/docker/gashers82/devops-tools-api)
 - [GitHub](https://github.com/GlenAshwood/DevOpsTools-API)
 
-
 ## Minikube Experiments
 - Experiment 1 - Basic application health check and app termination
 - Experiment 2 - HTTP health check and app termination
