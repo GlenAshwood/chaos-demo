@@ -272,6 +272,10 @@ pod/devops-tools-mongodb-secondary-0   1/1     Running   0          81s
 
 Although recovery wasnt seamless, we can now confidently say that our deployment will recovery from accidential pod terminations for both the API and the DB.
 
+### Experiment 4 - Drain Worker Node
+TBC
+### Experiment 5 - Delete Work Node
+TBC
 ## Reporting
 
 You can also report on your experiments by adding the **--journal-path** flag to your chaos run command
