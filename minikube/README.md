@@ -16,7 +16,7 @@ The application being tested is called DevOpsTools-API, a Node.js API that conne
 - [DockerHub](https://hub.docker.com/repository/docker/gashers82/devops-tools-api)
 - [GitHub](https://github.com/GlenAshwood/DevOpsTools-API)
 
-### Deployments
+### Original Deployments
 2 devops-tools-api pods
 1 MongoDB pod
 
@@ -65,7 +65,7 @@ Deploy API and Mongo into **chaos-space** namespace
 ```
 helm install devops-tools -f mongo-values.yaml\
   bitnami/mongodb
-kubectl apply -f api-setup-db-rs.yaml
+kubectl apply -f api-setup.yaml
 ```
 To check current Minikube IP
 ```
@@ -157,22 +157,23 @@ expected output:
 ```
 As expected (hopefully), the experiment failed. The DB tier does recover, but not quick enough and we have downtime. so lets try and fix that now by enabling ReplicaSet on our devopstools chart.
 
-First we need to delete the current helm chart (the API is using the same service name for both options, so we have to delete instead of upgrading)
+First we need to update our helm chart to enable replication 
 ```
-helm uninstall devops-tools
-```
-Then install it again with ReplicaSet enabled
-```
-helm install devops-tools -f mongo-values-rs.yaml\
+helm upgrade devops-tools -f mongo-values-rs.yaml\
   bitnami/mongodb
 ```
-And now, we have multiple instance of our DB
+once complete, we have multiple instance of our DB
 ```
 statefulset.apps/devopstools-release-mongodb-arbiter     1/1     115s
 statefulset.apps/devopstools-release-mongodb-primary     1/1     115s
 statefulset.apps/devopstools-release-mongodb-secondary   1/1     115s
 ```
-So, lets try experiment 3 again (I actually found this quite exciting, as I wasnt sure if it would work the first time I tried it!)
+We also need to update our application to use the new connection string. I found the easiest way to do this was by deleting and re-adding the configuration
+```
+kubectl delete -f api-setup.yaml
+kubectl apply -f api-setup-db-rs.yaml
+```
+So, lets try experiment 3 again (I actually found this quite exciting, as I wasnt sure if it would work the first time I tried it!).
 ```
 [2020-06-17 23:24:01 INFO] Validating the experiment's syntax
 [2020-06-17 23:24:02 INFO] Experiment looks valid
@@ -189,7 +190,77 @@ So, lets try experiment 3 again (I actually found this quite exciting, as I wasn
 [2020-06-17 23:24:04 INFO] No declared rollbacks, let's move on.
 [2020-06-17 23:24:04 INFO] Experiment ended with status: completed
 ```
-I got lucky the first time and the experiment passed, but I wanted to confirm that I got the same result for the arbiter, primary and secondary instances of the DB. I didnt, so I had to stop looking at how my application connected to the DB
+The experiment passed, but I wanted to confirm that the result was consistant for across all three instances of the DB. It wasnt, as the experiment would fail if the primary was the instance terminated. 
+
+```
+$chaos run chaos/health-test-3.yaml 
+
+[2020-06-18 14:50:52 INFO] Validating the experiment's syntax
+[2020-06-18 14:50:53 INFO] Experiment looks valid
+[2020-06-18 14:50:53 INFO] Running experiment: What happens if we terminate an instance of the MongoDB?
+[2020-06-18 14:50:53 INFO] Steady state hypothesis: The application is healthy
+[2020-06-18 14:50:53 INFO] Probe: app-responds-to-requests
+[2020-06-18 14:50:54 INFO] Steady state hypothesis is met!
+[2020-06-18 14:50:54 INFO] Action: terminate-db-pod
+[2020-06-18 14:50:54 INFO] Pausing after activity for 4s...
+[2020-06-18 14:50:56 INFO] Steady state hypothesis: The application is healthy
+[2020-06-18 14:50:56 INFO] Probe: app-responds-to-requests
+[2020-06-18 14:50:59 ERROR]   => failed: activity took too long to complete
+[2020-06-18 14:50:59 WARNING] Probe terminated unexpectedly, so its tolerance could not be validated
+[2020-06-18 14:50:59 CRITICAL] Steady state probe 'app-responds-to-requests' is not in the given tolerance so failing this experiment
+[2020-06-18 14:50:59 INFO] Let's rollback...
+[2020-06-18 14:50:59 INFO] No declared rollbacks, let's move on.
+[2020-06-18 14:50:59 INFO] Experiment ended with status: deviated
+[2020-06-18 14:50:59 INFO] The steady-state has deviated, a weakness may have been discovered
+
+$kubectl get pod
+
+NAME                                   READY   STATUS              RESTARTS   AGE
+pod/devops-tools-api-f96d765df-9zvhv   1/1     Running             0          60m
+pod/devops-tools-api-f96d765df-xmwpl   1/1     Running             0          60m
+pod/devops-tools-mongodb-arbiter-0     1/1     Running             0          64m
+pod/devops-tools-mongodb-primary-0     0/1     ContainerCreating   0          8s
+pod/devops-tools-mongodb-secondary-0   1/1     Running             0          64m
+```
+As I wasnt seeing the outage as the user (apart from a slower response), I decided to increase my pause timers until the primary passed the test. Obviously in the real world, you wouldnt do this, you would tune your application and database.
+
+So at 11 seconds (5.5 times slower than we originally wanted), our DB setup passes our experiment when the primary is terminated. 
+
+```
+chaos run chaos/health-test-4.yaml
+```
+Output
+```
+[2020-06-18 15:09:13 INFO] Validating the experiment's syntax
+[2020-06-18 15:09:13 INFO] Experiment looks valid
+[2020-06-18 15:09:13 INFO] Running experiment: What happens if we terminate an instance of the MongoDB?
+[2020-06-18 15:09:13 INFO] Steady state hypothesis: The application is healthy
+[2020-06-18 15:09:13 INFO] Probe: app-responds-to-requests
+[2020-06-18 15:09:13 INFO] Steady state hypothesis is met!
+[2020-06-18 15:09:13 INFO] Action: terminate-db-pod
+[2020-06-18 15:09:13 INFO] Pausing after activity for 11s...
+[2020-06-18 15:09:24 INFO] Steady state hypothesis: The application is healthy
+[2020-06-18 15:09:24 INFO] Probe: app-responds-to-requests
+[2020-06-18 15:09:25 INFO] Steady state hypothesis is met!
+[2020-06-18 15:09:25 INFO] Let's rollback...
+[2020-06-18 15:09:25 INFO] No declared rollbacks, let's move on.
+[2020-06-18 15:09:25 INFO] Experiment ended with status: completed
+
+$ kubectl get pods
+
+NAME                                   READY   STATUS    RESTARTS   AGE
+pod/devops-tools-api-f96d765df-9zvhv   1/1     Running   0          78m
+pod/devops-tools-api-f96d765df-xmwpl   1/1     Running   0          78m
+pod/devops-tools-mongodb-arbiter-0     1/1     Running   0          8m31s
+pod/devops-tools-mongodb-primary-0     0/1     Running   0          11s
+pod/devops-tools-mongodb-secondary-0   1/1     Running   0          81s
+```
+
+Although recovery wasnt seamless, we can now confidently say that our deployment will recovery from accidential pod terminations for both the API and the DB.
+
+## Reporting
+
+
 
 ## Destroy Application
 ```
