@@ -1,0 +1,37 @@
+version: 1.0.0
+title: What happens if we terminate an instance of the MongoDB?
+description: If an instance of the DB is terminated, dependant applications should still be operational.
+tags:
+- k8s
+- pod
+- http
+configuration:
+  ingress_host:
+      type: env
+      key: INGRESS_HOST
+steady-state-hypothesis:
+  title: The application is healthy
+  probes:
+  - name: app-responds-to-requests
+    type: probe
+    tolerance: 200
+    provider:
+      type: http
+      timeout: 3
+      verify_tls: false
+      url: http://${ingress_host}/tools
+      headers:
+        Host: devops-tools.io
+method:
+- type: action
+  name: terminate-db-pod
+  provider:
+    type: python
+    module: chaosk8s.pod.actions
+    func: terminate_pods
+    arguments:
+      label_selector: app=mongodb
+      rand: true
+      ns: chaos-space
+  pauses: 
+    after: 4

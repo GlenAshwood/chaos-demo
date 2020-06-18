@@ -1,0 +1,113 @@
+#Secret
+apiVersion: v1
+data:
+  DB: ZGV2b3BzP3JlcGxpY2FTZXQ9cnMwCg==
+  DB_HOST: ZGV2b3BzLXRvb2xzLW1vbmdvZGItcHJpbWFyeS0wLmRldm9wcy10b29scy1tb25nb2RiLWhlYWRsZXNzLmNoYW9zLXNwYWNlLnN2Yy5jbHVzdGVyLmxvY2FsOjI3MDE3LGRldm9wcy10b29scy1tb25nb2RiLWFyYml0ZXItMC5kZXZvcHMtdG9vbHMtbW9uZ29kYi1oZWFkbGVzcy5jaGFvcy1zcGFjZS5zdmMuY2x1c3Rlci5sb2NhbDoyNzAxNyxkZXZvcHMtdG9vbHMtbW9uZ29kYi1zZWNvbmRhcnktMC5kZXZvcHMtdG9vbHMtbW9uZ29kYi1oZWFkbGVzczoyNzAxNy5jaGFvcy1zcGFjZS5zdmMuY2x1c3Rlci5sb2NhbAo=
+  DB_PASS: VGVzdDEyMw==
+  DB_USER: bW9uZ29kYg==
+kind: Secret
+metadata:
+  name: mongo-conection-secret
+  namespace: chaos-space
+
+---
+#API Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: devops-tools-api
+  name: devops-tools-api
+  namespace: chaos-space
+spec:
+  selector:
+    matchLabels:
+      app: devops-tools-api
+  template:
+    metadata:
+      labels:
+        app: devops-tools-api
+    spec:
+      containers:
+      - image: gashers82/devops-tools-api:1.1.0-pm2
+        name: devops-tools-api
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: mongo-conection-secret
+        resources:
+            limits:
+              cpu: 40m
+              memory: 170Mi
+            requests:
+              cpu: 20m
+              memory: 100Mi
+
+---
+
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  namespace: chaos-space
+  name: devops-tools-api
+spec:
+  maxReplicas: 5
+  minReplicas: 3
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: devops-tools-api
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+#Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: devops-tools-api
+  name:  devops-tools-api-service
+  namespace: chaos-space
+spec:
+  ports:
+  - port: 3000 
+    protocol: TCP
+    targetPort: 3000
+    nodePort: 30080
+  selector:
+    app: devops-tools-api
+  type: NodePort
+status:
+  loadBalancer: {}
+
+---
+ apiVersion: networking.k8s.io/v1beta1 # for versions before 1.14 use extensions/v1beta1
+ kind: Ingress
+ metadata:
+   name: dev-tools-api-ingress
+   namespace: chaos-space
+   annotations:
+    kubernetes.io/ingress.class: nginx
+ spec:
+   rules:
+   - host: devops-tools.io
+     http:
+       paths:
+       - backend:
+           serviceName: devops-tools-api-service
+           servicePort: 3000
