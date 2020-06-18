@@ -62,11 +62,17 @@ Our chaos experiments will be run against an application called "DevOpsTools", a
 - Experiment 1 - Basic application health check and app termination
 - Experiment 2 - HTTP health check and app termination
 - Experiment 3 - HTTP health check and DB termination
+
 A walkthrough of these experiments can be found [Here](https://github.com/GlenAshwood/chaos-demo/tree/master/minikube)
 
 ## KIND Experiments
+- TBC
+
+A walkthrough of these experiments can be found [Here](https://github.com/GlenAshwood/chaos-demo/tree/master/kind)
 
 ## EKS Experients
-TBC
+- TBC
+
+A walkthrough of these experiments can be found [Here](https://github.com/GlenAshwood/chaos-demo/tree/master/eks)
 
 
