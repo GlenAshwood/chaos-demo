@@ -1,7 +1,9 @@
 global:
   namespaceOverride: chaos-space
-service:
-  name: devops-tools-mongodb-service
+replicaSet:
+  enabled: true
+  name: rs0
+useStatefulSet: true
 mongodbUsername: mongodb
 mongodbPassword: Test123
 mongodbDatabase: devops

@@ -1,8 +1,8 @@
 #Secret
 apiVersion: v1
 data:
-  DB: ZGV2b3Bz
-  DB_HOST: ZGV2b3BzLXRvb2xzLW1vbmdvZGItc2VydmljZToyNzAxNwo=
+  DB: ZGV2b3BzP3JlcGxpY2FTZXQ9cnMwCg==
+  DB_HOST: ZGV2b3BzLXRvb2xzLW1vbmdvZGItcHJpbWFyeS0wLmRldm9wcy10b29scy1tb25nb2RiLWhlYWRsZXNzLmNoYW9zLXNwYWNlLnN2Yy5jbHVzdGVyLmxvY2FsOjI3MDE3LGRldm9wcy10b29scy1tb25nb2RiLWFyYml0ZXItMC5kZXZvcHMtdG9vbHMtbW9uZ29kYi1oZWFkbGVzcy5jaGFvcy1zcGFjZS5zdmMuY2x1c3Rlci5sb2NhbDoyNzAxNyxkZXZvcHMtdG9vbHMtbW9uZ29kYi1zZWNvbmRhcnktMC5kZXZvcHMtdG9vbHMtbW9uZ29kYi1oZWFkbGVzczoyNzAxNy5jaGFvcy1zcGFjZS5zdmMuY2x1c3Rlci5sb2NhbAo=
   DB_PASS: VGVzdDEyMw==
   DB_USER: bW9uZ29kYg==
 kind: Secret
