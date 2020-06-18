@@ -9,6 +9,8 @@
 [Udemy Course](https://www.udemy.com/course/kubernetes-chaos-engineering-with-chaos-toolkit-and-istio/) on kubernetes chaos engineering with chaos toolkit and istio
 
 ## Dependencies
+To follow allow with the experiments within each section, you will need the following software installed:
+
 - [Git](https://git-scm.com/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 - [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) or [EKS](https://eksctl.io/)
@@ -17,21 +19,53 @@
 - [pip](https://pip.pypa.io/en/stable/installing)
 
 ##  Chaos Toolkit
+We will be using Chaos Toolkit to run our experiments, you can find out more information via the following links
+
 - [Git Repo](https://github.com/chaostoolkit/chaostoolkit)
 - [Website](https://chaostoolkit.org/)
+
+### To Install the CLI
+
+Install chaostoolkit as follows:
+```
+$ pip install chaostoolkit
+```
+You can verify the command was installed by running:
+
+```
+$ chaos --version
+```
+
 ### Addon used
+As we will be performing our experiments with Kubernetes, we need to install the chaostoolkit-kubernetes addon
 - [chaostoolkit-kubernetes](https://github.com/chaostoolkit/chaostoolkit-kubernetes)
-- [chaostoolkit-reporting](https://github.com/chaostoolkit/chaostoolkit-reporting)
 
+Install chaostoolkit-kubernetes add-on
+```
+pip install -U chaostoolkit-kubernetes
+chaos discover chaostoolkit-kubernetes
+```
 
+you can also install the reporting add-on, but that requires a few extra dependencies
+- [chaostoolkit-reporting (optional)](https://github.com/chaostoolkit/chaostoolkit-reporting)
 
-## Aplication
-The application being tested is called DevOpsTools-API
+## The Aplication we will be experimenting on
+Our chaos experiments will be run against an application called "DevOpsTools", a Nodejs API that connects to a MongoDB backend and written just for this project (I am not a developer, so please do not judge me too harshly). 
+
+<img src="screenshoot-2.png" align="centre" />
+
+### Extra Info
 - [DockerHub](https://hub.docker.com/repository/docker/gashers82/devops-tools-api)
 - [GitHub](https://github.com/GlenAshwood/DevOpsTools-API)
 
+
 ## Minikube Experiments
-[Here](https://github.com/GlenAshwood/chaos-demo/tree/master/minikube)
+- Experiment 1 - Basic application health check and app termination
+- Experiment 2 - HTTP health check and app termination
+- Experiment 3 - HTTP health check and DB termination
+A walkthrough of these experiments can be found [Here](https://github.com/GlenAshwood/chaos-demo/tree/master/minikube)
+
+## KIND Experiments
 
 ## EKS Experients
 TBC
