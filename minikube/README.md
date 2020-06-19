@@ -28,7 +28,7 @@ git clone https://github.com/GlenAshwood/chaos-demo.git
 cd minikube
 ```
 
-## Setup Cluster Minikube
+## Setup Minikube Cluster 
 
 Create or restart Minikube Cluster
 ```
