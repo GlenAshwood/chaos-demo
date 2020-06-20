@@ -29,11 +29,13 @@ spec:
         app: devops-tools-api
     spec:
       containers:
-      - image: gashers82/devops-tools-api:1.1.0-pm2
+      - image: gashers82/devops-tools-api:1.1.0
         name: devops-tools-api
         imagePullPolicy: Always
         ports:
-        - containerPort: 3000
+        - name: liveness-port
+          containerPort: 3000
+          hostPort: 3000
         envFrom:
         - secretRef:
             name: mongo-conection-secret
@@ -44,6 +46,21 @@ spec:
             requests:
               cpu: 20m
               memory: 100Mi
+        livenessProbe:
+          failureThreshold: 6
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: liveness-port
+          timeoutSeconds: 5
+        readinessProbe:
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: liveness-port
 
 ---
 

@@ -1,0 +1,37 @@
+version: 1.0.0
+title: What happens if we delete a node
+description: All the instances are distributed among healthy nodes and the applications are healthy
+tags:
+- k8s
+- deployment
+- node
+configuration:
+  ingress_host:
+      type: env
+      key: INGRESS_HOST
+steady-state-hypothesis:
+  title: Applications are indestructible
+  probes:
+  - name: app-responds-to-requests
+    type: probe
+    tolerance: 200
+    provider:
+      type: http
+      timeout: 3
+      verify_tls: false
+      url: http://${ingress_host}/tools
+      headers:
+        Host: devops-tools.io
+method:
+- type: action
+  name: delete-node
+  provider:
+    type: python
+    func: delete_nodes
+    module: chaosk8s.node.actions
+    arguments:
+      label_selector: delete-ready=true
+      count: 1
+      pod_namespace: chaos-space
+  pauses: 
+    after: 10
