@@ -77,7 +77,11 @@ A walkthrough of these experiments can be found [Here](https://github.com/GlenAs
 A walkthrough of these experiments can be found [Here](https://github.com/GlenAshwood/chaos-demo/tree/master/kind)
 
 ## EKS Experients
-- TBC
+- Experiment 1 - Basic application health check and app termination
+- Experiment 2 - HTTP health check and app termination
+- Experiment 3 - HTTP health check and DB termination
+- Experiment 4 - Draining a Worker Node
+- Experiment 5 - Deleting a worker Node (or two)
 
 A walkthrough of these experiments can be found [Here](https://github.com/GlenAshwood/chaos-demo/tree/master/eks)
 
