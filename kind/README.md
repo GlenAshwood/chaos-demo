@@ -272,7 +272,7 @@ pod/devops-tools-mongodb-secondary-0   1/1     Running   0          81s
 
 Although recovery wasnt seamless, we can now confidently say that our deployment will recovery from accidential pod terminations for both the API and the DB.
 
-## Draining and deleting Nodes
+## Draining and Deleting Worker Nodes
 
 ### Experiment 4 - Draining a Worker Node
 
