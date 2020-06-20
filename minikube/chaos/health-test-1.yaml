@@ -1,25 +1,49 @@
 version: 1.0.0
-title: What happens if we terminate an instance of the application (devops-tools-api)?
-description: If an instance of the application is terminated, a new instance should be created
+title: What happens if we terminate a Pod?
+description: If a Pod is terminated, a new one should be created in its places.
 tags:
 - k8s
 - pod
-- deployment
 steady-state-hypothesis:
-  title: The application is healthy
+  title: Pod exists
   probes:
-  - name: all-apps-are-healthy
+  - name: pod-exists
+    type: probe
+    tolerance: [1,2,3,4,5]
+    provider:
+      type: python
+      func: count_pods
+      module: chaosk8s.pod.probes
+      arguments:
+        label_selector: app=devops-tools-api
+        ns: chaos-space
+  - name: pod-in-phase
     type: probe
     tolerance: true
     provider:
       type: python
-      func: all_microservices_healthy
-      module: chaosk8s.probes
+      func: pods_in_phase
+      module: chaosk8s.pod.probes
       arguments:
+        label_selector: app=devops-tools-api
         ns: chaos-space
+        phase: Running
+  - name: pod-in-conditions
+    type: probe
+    tolerance: true
+    provider:
+      type: python
+      func: pods_in_conditions
+      module: chaosk8s.pod.probes
+      arguments:
+        label_selector: app=devops-tools-api
+        ns: chaos-space
+        conditions:
+        - type: Ready
+          status: "True"
 method:
 - type: action
-  name: terminate-app-pod
+  name: terminate-pod
   provider:
     type: python
     module: chaosk8s.pod.actions
@@ -28,3 +52,5 @@ method:
       label_selector: app=devops-tools-api
       rand: true
       ns: chaos-space
+  pauses: 
+    after: 15

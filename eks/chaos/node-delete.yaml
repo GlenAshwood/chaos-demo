@@ -1,5 +1,5 @@
 version: 1.0.0
-title: What happens if we drain a node
+title: What happens if we delete a node
 description: All the instances are distributed among healthy nodes and the applications are healthy
 tags:
 - k8s
@@ -24,24 +24,14 @@ steady-state-hypothesis:
         Host: devops-tools.io
 method:
 - type: action
-  name: drain-node
+  name: delete-node
   provider:
     type: python
-    func: drain_nodes
+    func: delete_nodes
     module: chaosk8s.node.actions
     arguments:
-      label_selector: beta.kubernetes.io/os=linux
+      label_selector: delete-ready=true
       count: 1
       pod_namespace: chaos-space
-      delete_pods_with_local_storage: true
   pauses: 
-    after: 5
-rollbacks:
-- type: action
-  name: uncordon-node
-  provider:
-    type: python
-    func: uncordon_node
-    module: chaosk8s.node.actions
-    arguments:
-      label_selector: beta.kubernetes.io/os=linux
+    after: 10

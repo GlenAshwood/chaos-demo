@@ -35,7 +35,7 @@ method:
       pod_namespace: chaos-space
       delete_pods_with_local_storage: true
   pauses: 
-    after: 5
+    after: 1
 rollbacks:
 - type: action
   name: uncordon-node

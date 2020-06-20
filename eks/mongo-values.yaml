@@ -1,0 +1,7 @@
+global:
+  namespaceOverride: chaos-space
+service:
+  name: devops-tools-mongodb-service
+mongodbUsername: mongodb
+mongodbPassword: Test123
+mongodbDatabase: devops

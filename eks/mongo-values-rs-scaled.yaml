@@ -1,0 +1,13 @@
+global:
+  namespaceOverride: chaos-space
+replicaSet:
+  enabled: true
+  name: rs0
+  replicas:
+    secondary: 2
+    arbiter: 2
+useStatefulSet: true
+
+mongodbUsername: mongodb
+mongodbPassword: Test123
+mongodbDatabase: devops
