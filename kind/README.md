@@ -50,7 +50,7 @@ Enable *metrics-server* :
 ```
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
 ```
-Export Minikube ip to $INGRESS_HOST (which will be used later):
+Export Localhost/loopback ip to $INGRESS_HOST (which will be used later):
 ```
 export INGRESS_HOST=127.0.0.1
 ```
@@ -81,13 +81,13 @@ helm install devops-tools -f mongo-values.yaml\
   bitnami/mongodb
 kubectl apply -f api-setup.yaml
 ```
-To check current Minikube IP
+Check Application in webbrowser: 
 ```
-minikube ip
+http://devops-tools.io
 ```
-To open Application in default browser: 
+or 
 ```
-minikube service devops-tools-api-service  -n chaos-space
+http://127.0.0.1
 ```
 
 ## Terminating PODs within our Cluster
@@ -272,10 +272,201 @@ pod/devops-tools-mongodb-secondary-0   1/1     Running   0          81s
 
 Although recovery wasnt seamless, we can now confidently say that our deployment will recovery from accidential pod terminations for both the API and the DB.
 
-### Experiment 4 - Drain Worker Node
-TBC
-### Experiment 5 - Delete Work Node
-TBC
+## Draining and deleting Nodes
+
+### Experiment 4 - Draining a Worker Node
+
+This expierment verifies what happens to our application when a node is drained, replicating what could happen for a cluster upgrade or a scheduled maintenance window.
+
+For this experiment, we need to make sure that we have deployed three instances of our application (**api-setup-db-rs.yaml**) and that we have enabled ReplicateSets for our DB (**mongo-values-rs.yam**):
+
+```
+helm install devops-tools -f mongo-values-rs.yaml \
+  bitnami/mongodb
+  
+kubectl apply -f api-setup-db-rs.yaml
+```
+Output:
+
+kubectl get pods -o wide
+```
+NAME                                READY   STATUS    RESTARTS   AGE   IP            NODE                    NOMINATED NODE   READINESS GATES
+devops-tools-api-5d7c4f7499-9sgdc   1/1     Running   0          11m   10.244.1.7    chaos-cluster-worker3   <none>           <none>
+devops-tools-api-5d7c4f7499-l5mk9   1/1     Running   0          12m   10.244.3.9    chaos-cluster-worker    <none>           <none>
+devops-tools-api-5d7c4f7499-smddj   1/1     Running   0          12m   10.244.2.5    chaos-cluster-worker2   <none>           <none>
+devops-tools-mongodb-arbiter-0      1/1     Running   0          41s   10.244.1.8    chaos-cluster-worker3   <none>           <none>
+devops-tools-mongodb-primary-0      1/1     Running   0          41s   10.244.3.10   chaos-cluster-worker    <none>           <none>
+devops-tools-mongodb-secondary-0    1/1     Running   0          41s   10.244.3.11   chaos-cluster-worker    <none>           <none>
+```
+By adding the **-o wide** flag to our get pods command, we can see which nodes our application and DB instances have been deployed to
+
+Now we have made sure our application is setup the way we require, we can run our next expierment.
+
+To run the test, use the following command:
+```
+chaos run chaos/node-drain.yaml
+```
+Output
+```
+[2020-06-20 16:02:34 INFO] Validating the experiment's syntax
+[2020-06-20 16:02:36 INFO] Experiment looks valid
+[2020-06-20 16:02:36 INFO] Running experiment: What happens if we drain a node
+[2020-06-20 16:02:36 INFO] Steady state hypothesis: Applications are indestructible
+[2020-06-20 16:02:36 INFO] Probe: app-responds-to-requests
+[2020-06-20 16:02:36 INFO] Steady state hypothesis is met!
+[2020-06-20 16:02:36 INFO] Action: drain-node
+[2020-06-20 16:02:37 ERROR]   => failed: chaoslib.exceptions.ActivityFailed: Failed to evict pod devops-tools-mongodb-secondary-0: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Cannot evict pod as it would violate the pod's disruption budget.","reason":"TooManyRequests","details":{"causes":[{"reason":"DisruptionBudget","message":"The disruption budget devops-tools-mongodb-secondary needs 1 healthy pods and has 1 currently"}]},"code":429}
+[2020-06-20 16:02:37 INFO] Pausing after activity for 1s...
+[2020-06-20 16:02:38 INFO] Steady state hypothesis: Applications are indestructible
+[2020-06-20 16:02:38 INFO] Probe: app-responds-to-requests
+[2020-06-20 16:02:38 INFO] Steady state hypothesis is met!
+[2020-06-20 16:02:38 INFO] Let's rollback...
+[2020-06-20 16:02:38 INFO] Rollback: uncordon-node
+[2020-06-20 16:02:38 INFO] Action: uncordon-node
+[2020-06-20 16:02:38 INFO] Experiment ended with status: completed
+```
+However, we run into an issue and the experiment fails due to the disruption budget for Mongo DB.
+
+Lets try scaling both arbiter and secondary to 2 instances
+
+```
+helm upgrade devops-tools -f mongo-values-rs-scaled.yaml\
+  bitnami/mongodb
+```
+kubectl get pods
+```
+NAME                                READY   STATUS    RESTARTS   AGE
+devops-tools-api-5d7c4f7499-9sgdc   1/1     Running   0          44m
+devops-tools-api-5d7c4f7499-m8ww4   1/1     Running   0          21m
+devops-tools-api-5d7c4f7499-smddj   1/1     Running   0          46m
+devops-tools-mongodb-arbiter-0      1/1     Running   0          28s
+devops-tools-mongodb-arbiter-1      1/1     Running   0          75s
+devops-tools-mongodb-primary-0      1/1     Running   0          20m
+devops-tools-mongodb-secondary-0    1/1     Running   0          34m
+devops-tools-mongodb-secondary-1    1/1     Running   0          2m51s
+```
+Lets try our same experiment again
+```
+chaos run chaos/node-drain.yaml
+```
+Output
+```
+[2020-06-20 16:26:41 INFO] Validating the experiment's syntax
+[2020-06-20 16:26:42 INFO] Experiment looks valid
+[2020-06-20 16:26:42 INFO] Running experiment: What happens if we drain a node
+[2020-06-20 16:26:42 INFO] Steady state hypothesis: Applications are indestructible
+[2020-06-20 16:26:42 INFO] Probe: app-responds-to-requests
+[2020-06-20 16:26:42 INFO] Steady state hypothesis is met!
+[2020-06-20 16:26:42 INFO] Action: drain-node
+[2020-06-20 16:26:53 INFO] Pausing after activity for 1s...
+[2020-06-20 16:26:54 INFO] Steady state hypothesis: Applications are indestructible
+[2020-06-20 16:26:54 INFO] Probe: app-responds-to-requests
+[2020-06-20 16:26:54 INFO] Steady state hypothesis is met!
+[2020-06-20 16:26:54 INFO] Let's rollback...
+[2020-06-20 16:26:54 INFO] Rollback: uncordon-node
+[2020-06-20 16:26:54 INFO] Action: uncordon-node
+[2020-06-20 16:26:54 INFO] Experiment ended with status: completed
+```
+And our experiment now runs succuesslly and we are confident that our application is robust enough to recover from a node within the cluster being drained and uncordon again
+
+### Experiment 5 - Deleting a Worker Node (or two)
+
+We will now finally verify what happens to our application when we delete a node within the cluster, trying to replicate a possible platform outage or misconfiguration.
+
+To make sure that we dont delete the controller node (yes, that happened for me!), we will add a label to each worker node
+```
+kubectl label nodes chaos-cluster-worker delete-ready=true
+kubectl label nodes chaos-cluster-worker2 delete-ready=true
+kubectl label nodes chaos-cluster-worker3 delete-ready=true
+```
+
+We will be keeping the same configuration that sucesscfully passed the last expierment, so please make sure you are using the scaled DB setup to start this expierment:
+
+New:
+```
+helm install devops-tools -f mongo-values-rs-scaled.yaml \
+  bitnami/mongodb
+
+kubectl apply -f api-setup-db-rs.yaml
+```
+Upgrade:
+```
+helm upgrade devops-tools -f mongo-values-rs-scaled.yaml \
+  bitnami/mongodb
+
+kubectl apply -f api-setup-db-rs.yaml
+```
+Output
+```
+kubectl get pod
+NAME                                READY   STATUS    RESTARTS   AGE
+devops-tools-api-5d7c4f7499-csjp6   1/1     Running   0          7m50s
+devops-tools-api-5d7c4f7499-m8ww4   1/1     Running   0          36m
+devops-tools-api-5d7c4f7499-r648h   1/1     Running   0          13m
+devops-tools-mongodb-arbiter-0      1/1     Running   3          13m
+devops-tools-mongodb-arbiter-1      1/1     Running   4          16m
+devops-tools-mongodb-primary-0      1/1     Running   0          36m
+devops-tools-mongodb-secondary-0    1/1     Running   0          49m
+devops-tools-mongodb-secondary-1    1/1     Running   0          7m47s
+```
+To run the experiment
+```
+chaos run chaos/node-delete.yaml.yaml 
+```
+Output
+```
+[2020-06-20 16:58:48 INFO] Validating the experiment's syntax
+[2020-06-20 16:58:49 INFO] Experiment looks valid
+[2020-06-20 16:58:49 INFO] Running experiment: What happens if we delete a node
+[2020-06-20 16:58:49 INFO] Steady state hypothesis: Applications are indestructible
+[2020-06-20 16:58:49 INFO] Probe: app-responds-to-requests
+[2020-06-20 16:58:50 INFO] Steady state hypothesis is met!
+[2020-06-20 16:58:50 INFO] Action: delete-node
+[2020-06-20 16:58:50 INFO] Pausing after activity for 10s...
+[2020-06-20 16:59:00 INFO] Steady state hypothesis: Applications are indestructible
+[2020-06-20 16:59:00 INFO] Probe: app-responds-to-requests
+[2020-06-20 16:59:03 INFO] Steady state hypothesis is met!
+[2020-06-20 16:59:03 INFO] Let's rollback...
+[2020-06-20 16:59:03 INFO] No declared rollbacks, let's move on.
+[2020-06-20 16:59:03 INFO] Experiment ended with status: completed
+
+kubectl get nodes
+
+NAME                          STATUS   ROLES    AGE   VERSION
+chaos-cluster-control-plane   Ready    master   22m   v1.18.2
+chaos-cluster-worker          Ready    <none>   22m   v1.18.2
+chaos-cluster-worker2         Ready    <none>   22m   v1.18.2
+
+```
+Happy days (unless your name was chaos-cluster-worker3), our application continuted to function even after we lost a node within our cluster. If we were feeling really brave, I guess we could run the expierment ONE MORE TIME:
+
+```
+$ chaos run chaos/node-delete.yaml 
+
+[2020-06-20 17:36:38 INFO] Validating the experiment's syntax
+[2020-06-20 17:36:38 INFO] Experiment looks valid
+[2020-06-20 17:36:38 INFO] Running experiment: What happens if we delete a node
+[2020-06-20 17:36:38 INFO] Steady state hypothesis: Applications are indestructible
+[2020-06-20 17:36:38 INFO] Probe: app-responds-to-requests
+[2020-06-20 17:36:38 INFO] Steady state hypothesis is met!
+[2020-06-20 17:36:38 INFO] Action: delete-node
+[2020-06-20 17:36:38 INFO] Pausing after activity for 10s...
+[2020-06-20 17:36:48 INFO] Steady state hypothesis: Applications are indestructible
+[2020-06-20 17:36:48 INFO] Probe: app-responds-to-requests
+[2020-06-20 17:36:49 INFO] Steady state hypothesis is met!
+[2020-06-20 17:36:49 INFO] Let's rollback...
+[2020-06-20 17:36:49 INFO] No declared rollbacks, let's move on.
+[2020-06-20 17:36:49 INFO] Experiment ended with status: completed
+
+kubectl get nodes
+
+NAME                          STATUS   ROLES    AGE   VERSION
+chaos-cluster-control-plane   Ready    master   24m   v1.18.2
+chaos-cluster-worker2         Ready    <none>   23m   v1.18.2
+```
+
+Even better, we now know we can actually lost two nodes within our cluster and our application will still successfully pass our our steadystate probe.
+
 ## Reporting
 
 You can also report on your experiments by adding the **--journal-path** flag to your chaos run command
@@ -336,16 +527,20 @@ Once complete, you will have generated a pdf version of report like the example 
 <img src="report-example.png" align="centre" />
 
 ## Destroy Application
+Once complete, please remember to delete our deployment and revert back to the **default** namespace
 ```
 kubectl delete -f api-setup.yaml
 helm uninstall devopstools-release
+kubectl config set-context --current --namespace=default
 ```
 or 
 ```
 kubectl delete ns chaos-space
+kubectl config set-context --current --namespace=default
 ```
 
 ## Destroy Cluster
+To delete your cluster, run the following command
 ```
 kind delete cluster --name=chaos-cluster 
 ```
