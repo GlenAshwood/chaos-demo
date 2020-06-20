@@ -527,7 +527,7 @@ Once complete, you will have generated a pdf version of report like the example 
 <img src="report-example.png" align="centre" />
 
 ## Destroy Application
-Once complete, please remember to delete our deployment and revert back to the **default** namespace
+Once complete, please remember to delete deployments and revert back to the **default** namespace
 ```
 kubectl delete -f api-setup.yaml
 helm uninstall devopstools-release
