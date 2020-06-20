@@ -22,7 +22,7 @@ The application being tested is called DevOpsTools-API, a Node.js API that conne
 
 ### Clone Repo
 
-to follow along with the following experiment, please clone this repo and cd to **minikube**
+To follow along, please clone the **chaos-demo** repo and cd to **kind**
 ```
 git clone https://github.com/GlenAshwood/chaos-demo.git
 cd kind
@@ -77,8 +77,10 @@ kubectl config set-context --current --namespace=chaos-space
 
 Deploy API and Mongo into **chaos-space** namespace
 ```
+helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install devops-tools -f mongo-values.yaml\
   bitnami/mongodb
+  
 kubectl apply -f api-setup.yaml
 ```
 Check Application in webbrowser: 
@@ -100,21 +102,26 @@ chaos run chaos/health-test-1.yaml
 ```
 expected output:
 ``` bash
-[2020-06-17 13:47:42 INFO] Validating the experiment's syntax
-[2020-06-17 13:47:43 INFO] Experiment looks valid
-[2020-06-17 13:47:43 INFO] Running experiment: What happens if we terminate an instance of the application (devops-tools-api)?
-[2020-06-17 13:47:43 INFO] Steady state hypothesis: The app is healthy
-[2020-06-17 13:47:43 INFO] Probe: all-apps-are-healthy
-[2020-06-17 13:47:43 INFO] Steady state hypothesis is met!
-[2020-06-17 13:47:43 INFO] Action: terminate-app-pod
-[2020-06-17 13:47:43 INFO] Steady state hypothesis: The app is healthy
-[2020-06-17 13:47:43 INFO] Probe: all-apps-are-healthy
-[2020-06-17 13:47:43 INFO] Steady state hypothesis is met!
-[2020-06-17 13:47:43 INFO] Let's rollback...
-[2020-06-17 13:47:43 INFO] No declared rollbacks, let's move on.
-[2020-06-17 13:47:43 INFO] Experiment ended with status: completed
+[2020-06-20 23:32:12 INFO] Validating the experiment's syntax
+[2020-06-20 23:32:13 INFO] Experiment looks valid
+[2020-06-20 23:32:13 INFO] Running experiment: What happens if we terminate a Pod?
+[2020-06-20 23:32:13 INFO] Steady state hypothesis: Pod exists
+[2020-06-20 23:32:13 INFO] Probe: pod-exists
+[2020-06-20 23:32:13 INFO] Probe: pod-in-phase
+[2020-06-20 23:32:14 INFO] Probe: pod-in-conditions
+[2020-06-20 23:32:14 INFO] Steady state hypothesis is met!
+[2020-06-20 23:32:14 INFO] Action: terminate-pod
+[2020-06-20 23:32:14 INFO] Pausing after activity for 15s...
+[2020-06-20 23:32:29 INFO] Steady state hypothesis: Pod exists
+[2020-06-20 23:32:29 INFO] Probe: pod-exists
+[2020-06-20 23:32:29 INFO] Probe: pod-in-phase
+[2020-06-20 23:32:30 INFO] Probe: pod-in-conditions
+[2020-06-20 23:32:30 INFO] Steady state hypothesis is met!
+[2020-06-20 23:32:30 INFO] Let's rollback...
+[2020-06-20 23:32:30 INFO] No declared rollbacks, let's move on.
+[2020-06-20 23:32:30 INFO] Experiment ended with status: completed
 ```
-The experiment passed, but it really doesnt tell us anything that useful beisdes the pods within that namespace are running before and after the experiment.
+The experiment passed, but it really doesnt tell us anything that useful besides the pods within that namespace are running before and after the experiment.
 
 ### Experiment 2 - HTTP health check and app termination
 
@@ -125,20 +132,20 @@ chaos run chaos/health-test-2.yaml
 ```
 expected output:
 ``` bash
-[2020-06-17 17:48:46 INFO] Validating the experiment's syntax
-[2020-06-17 17:48:47 INFO] Experiment looks valid
-[2020-06-17 17:48:47 INFO] Running experiment: What happens if we terminate an instance of the application(devops-tools-api)?
-[2020-06-17 17:48:47 INFO] Steady state hypothesis: The application is healthy
-[2020-06-17 17:48:47 INFO] Probe: app-responds-to-requests
-[2020-06-17 17:48:47 INFO] Steady state hypothesis is met!
-[2020-06-17 17:48:47 INFO] Action: terminate-app-pod
-[2020-06-17 17:48:47 INFO] Pausing after activity for 2s...
-[2020-06-17 17:48:49 INFO] Steady state hypothesis: The application is healthy
-[2020-06-17 17:48:49 INFO] Probe: app-responds-to-requests
-[2020-06-17 17:48:49 INFO] Steady state hypothesis is met!
-[2020-06-17 17:48:49 INFO] Let's rollback...
-[2020-06-17 17:48:49 INFO] No declared rollbacks, let's move on.
-[2020-06-17 17:48:49 INFO] Experiment ended with status: completed
+[2020-06-20 23:35:40 INFO] Validating the experiment's syntax
+[2020-06-20 23:35:41 INFO] Experiment looks valid
+[2020-06-20 23:35:41 INFO] Running experiment: What happens if we terminate an instance of the application(devops-tools-api)?
+[2020-06-20 23:35:41 INFO] Steady state hypothesis: The application is healthy
+[2020-06-20 23:35:41 INFO] Probe: app-responds-to-requests
+[2020-06-20 23:35:42 INFO] Steady state hypothesis is met!
+[2020-06-20 23:35:42 INFO] Action: terminate-app-pod
+[2020-06-20 23:35:43 INFO] Pausing after activity for 2s...
+[2020-06-20 23:35:45 INFO] Steady state hypothesis: The application is healthy
+[2020-06-20 23:35:45 INFO] Probe: app-responds-to-requests
+[2020-06-20 23:35:45 INFO] Steady state hypothesis is met!
+[2020-06-20 23:35:45 INFO] Let's rollback...
+[2020-06-20 23:35:45 INFO] No declared rollbacks, let's move on.
+[2020-06-20 23:35:45 INFO] Experiment ended with status: completed
 ```
 Again, the experiment passed, which gives us a little bit more confidence in our application's ability to recover from a slight outage, but what happens if the same thing happens to the DB instance?
 
@@ -151,32 +158,33 @@ chaos run chaos/health-test-3.yaml
 ```
 expected output:
 ``` bash
-[2020-06-17 22:49:41 INFO] Validating the experiment's syntax
-[2020-06-17 22:49:41 INFO] Experiment looks valid
-[2020-06-17 22:49:41 INFO] Running experiment: What happens if we terminate an instance of the MongoDB?
-[2020-06-17 22:49:41 INFO] Steady state hypothesis: The application is healthy
-[2020-06-17 22:49:41 INFO] Probe: app-responds-to-requests
-[2020-06-17 22:49:42 INFO] Steady state hypothesis is met!
-[2020-06-17 22:49:42 INFO] Action: terminate-db-pod
-[2020-06-17 22:49:42 INFO] Pausing after activity for 2s...
-[2020-06-17 22:49:44 INFO] Steady state hypothesis: The application is healthy
-[2020-06-17 22:49:44 INFO] Probe: app-responds-to-requests
-[2020-06-17 22:49:47 ERROR]   => failed: activity took too long to complete
-[2020-06-17 22:49:47 WARNING] Probe terminated unexpectedly, so its tolerance could not be validated
-[2020-06-17 22:49:47 CRITICAL] Steady state probe 'app-responds-to-requests' is not in the given tolerance so failing this experiment
-[2020-06-17 22:49:47 INFO] Let's rollback...
-[2020-06-17 22:49:47 INFO] No declared rollbacks, let's move on.
-[2020-06-17 22:49:47 INFO] Experiment ended with status: deviated
-[2020-06-17 22:49:47 INFO] The steady-state has deviated, a weakness may have been discovered
+[2020-06-20 23:36:57 INFO] Validating the experiment's syntax
+[2020-06-20 23:36:58 INFO] Experiment looks valid
+[2020-06-20 23:36:58 INFO] Running experiment: What happens if we terminate an instance of the MongoDB?
+[2020-06-20 23:36:58 INFO] Steady state hypothesis: The application is healthy
+[2020-06-20 23:36:58 INFO] Probe: app-responds-to-requests
+[2020-06-20 23:36:58 INFO] Steady state hypothesis is met!
+[2020-06-20 23:36:58 INFO] Action: terminate-db-pod
+[2020-06-20 23:36:58 INFO] Pausing after activity for 4s...
+[2020-06-20 23:37:02 INFO] Steady state hypothesis: The application is healthy
+[2020-06-20 23:37:02 INFO] Probe: app-responds-to-requests
+[2020-06-20 23:37:06 ERROR]   => failed: activity took too long to complete
+[2020-06-20 23:37:06 WARNING] Probe terminated unexpectedly, so its tolerance could not be validated
+[2020-06-20 23:37:06 CRITICAL] Steady state probe 'app-responds-to-requests' is not in the given tolerance so failing this experiment
+[2020-06-20 23:37:06 INFO] Let's rollback...
+[2020-06-20 23:37:06 INFO] No declared rollbacks, let's move on.
+[2020-06-20 23:37:06 INFO] Experiment ended with status: deviated
+[2020-06-20 23:37:06 INFO] The steady-state has deviated, a weakness may have been discovered
+
 ```
-As expected (hopefully), the experiment failed. The DB tier does recover, but not quick enough and we have downtime. so lets try and fix that now by enabling ReplicaSet on our devopstools chart.
+As expected (hopefully), the experiment failed. The DB tier does recover, but not quickily enough and we have downtime. so lets try and fix that now by enabling ReplicaSet on our devopstools chart.
 
 First we need to update our helm chart to enable replication 
 ```
 helm upgrade devops-tools -f mongo-values-rs.yaml\
   bitnami/mongodb
 ```
-once complete, we have multiple instance of our DB
+Once complete, we now have multiple instance of our DB
 ```
 statefulset.apps/devopstools-release-mongodb-arbiter     1/1     115s
 statefulset.apps/devopstools-release-mongodb-primary     1/1     115s
@@ -188,23 +196,28 @@ kubectl delete -f api-setup.yaml
 kubectl apply -f api-setup-db-rs.yaml
 ```
 So, lets try experiment 3 again.
+
 ```
-[2020-06-17 23:24:01 INFO] Validating the experiment's syntax
-[2020-06-17 23:24:02 INFO] Experiment looks valid
-[2020-06-17 23:24:02 INFO] Running experiment: What happens if we terminate an instance of the MongoDB?
-[2020-06-17 23:24:02 INFO] Steady state hypothesis: The application is healthy
-[2020-06-17 23:24:02 INFO] Probe: app-responds-to-requests
-[2020-06-17 23:24:02 INFO] Steady state hypothesis is met!
-[2020-06-17 23:24:02 INFO] Action: terminate-db-pod
-[2020-06-17 23:24:02 INFO] Pausing after activity for 2s...
-[2020-06-17 23:24:04 INFO] Steady state hypothesis: The application is healthy
-[2020-06-17 23:24:04 INFO] Probe: app-responds-to-requests
-[2020-06-17 23:24:04 INFO] Steady state hypothesis is met!
-[2020-06-17 23:24:04 INFO] Let's rollback...
-[2020-06-17 23:24:04 INFO] No declared rollbacks, let's move on.
-[2020-06-17 23:24:04 INFO] Experiment ended with status: completed
+chaos run chaos/health-test-3.yaml
 ```
-The experiment passed, but I wanted to confirm that the result were consistant across all three instances of the DB. It wasnt, as the experiment would fail if the primary was the instance terminated. 
+expected output:
+```
+[2020-06-20 23:52:26 INFO] Validating the experiment's syntax
+[2020-06-20 23:52:27 INFO] Experiment looks valid
+[2020-06-20 23:52:27 INFO] Running experiment: What happens if we terminate an instance of the MongoDB?
+[2020-06-20 23:52:27 INFO] Steady state hypothesis: The application is healthy
+[2020-06-20 23:52:27 INFO] Probe: app-responds-to-requests
+[2020-06-20 23:52:28 INFO] Steady state hypothesis is met!
+[2020-06-20 23:52:28 INFO] Action: terminate-db-pod
+[2020-06-20 23:52:28 INFO] Pausing after activity for 4s...
+[2020-06-20 23:52:32 INFO] Steady state hypothesis: The application is healthy
+[2020-06-20 23:52:32 INFO] Probe: app-responds-to-requests
+[2020-06-20 23:52:32 INFO] Steady state hypothesis is met!
+[2020-06-20 23:52:32 INFO] Let's rollback...
+[2020-06-20 23:52:32 INFO] No declared rollbacks, let's move on.
+[2020-06-20 23:52:32 INFO] Experiment ended with status: completed
+```
+The experiment passed, but I wanted to confirm that the results were consistant across all three instances of the DB. It wasnt, as the experiment would fail if the primary was the instance terminated. 
 
 ```
 $chaos run chaos/health-test-3.yaml 
