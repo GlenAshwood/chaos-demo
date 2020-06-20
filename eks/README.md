@@ -7,7 +7,7 @@ WARNING: Using an EKS cluster compared to kind or Minikube will cost you money w
 ## Dependencies
 - [Git](https://git-scm.com/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-- [aws cli] (https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+- [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 - [etsctl](https://eksctl.io/)
 - [Helm v3.x](https://helm.sh/docs/intro/install/)
 - [Python v3.x](https://www.python.org/downloads)
@@ -41,6 +41,11 @@ The following instructions will assume you have the following setup:
 - An account with AWS
 - Credentials with adequate permissions to create, update destroy an EKS cluster within AWS
 - Installed and configured the AWS CLI to use those credenticals
+
+set Default Region (example)
+```
+export AWS_DEFAULT_REGION=us-west-2
+```
 
 ```
 eksctl create cluster \
@@ -564,5 +569,7 @@ kubectl config set-context --current --namespace=default
 ## Destroy Cluster
 To delete your cluster, run the following command
 ```
-kind delete cluster --name=chaos-cluster 
+eksctl delete cluster \
+ --name chaos \
+ --region $AWS_DEFAULT_REGION 
 ```
