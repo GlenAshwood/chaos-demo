@@ -415,20 +415,20 @@ chaos run chaos/node-delete.yaml.yaml
 ```
 Output
 ```
-[2020-06-20 16:58:48 INFO] Validating the experiment's syntax
-[2020-06-20 16:58:49 INFO] Experiment looks valid
-[2020-06-20 16:58:49 INFO] Running experiment: What happens if we delete a node
-[2020-06-20 16:58:49 INFO] Steady state hypothesis: Applications are indestructible
-[2020-06-20 16:58:49 INFO] Probe: app-responds-to-requests
-[2020-06-20 16:58:50 INFO] Steady state hypothesis is met!
-[2020-06-20 16:58:50 INFO] Action: delete-node
-[2020-06-20 16:58:50 INFO] Pausing after activity for 10s...
-[2020-06-20 16:59:00 INFO] Steady state hypothesis: Applications are indestructible
-[2020-06-20 16:59:00 INFO] Probe: app-responds-to-requests
-[2020-06-20 16:59:03 INFO] Steady state hypothesis is met!
-[2020-06-20 16:59:03 INFO] Let's rollback...
-[2020-06-20 16:59:03 INFO] No declared rollbacks, let's move on.
-[2020-06-20 16:59:03 INFO] Experiment ended with status: completed
+[2020-06-20 17:34:58 INFO] Validating the experiment's syntax
+[2020-06-20 17:34:58 INFO] Experiment looks valid
+[2020-06-20 17:34:58 INFO] Running experiment: What happens if we delete a node
+[2020-06-20 17:34:58 INFO] Steady state hypothesis: Applications are indestructible
+[2020-06-20 17:34:58 INFO] Probe: app-responds-to-requests
+[2020-06-20 17:34:58 INFO] Steady state hypothesis is met!
+[2020-06-20 17:34:58 INFO] Action: delete-node
+[2020-06-20 17:34:58 INFO] Pausing after activity for 10s...
+[2020-06-20 17:35:08 INFO] Steady state hypothesis: Applications are indestructible
+[2020-06-20 17:35:08 INFO] Probe: app-responds-to-requests
+[2020-06-20 17:35:10 INFO] Steady state hypothesis is met!
+[2020-06-20 17:35:10 INFO] Let's rollback...
+[2020-06-20 17:35:10 INFO] No declared rollbacks, let's move on.
+[2020-06-20 17:35:10 INFO] Experiment ended with status: completed
 
 kubectl get nodes
 
